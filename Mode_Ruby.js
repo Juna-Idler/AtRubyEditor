@@ -4,6 +4,9 @@
 
 const list = document.getElementById("LineList");
 
+const pickupwindow = document.getElementById("PickupWindow");
+const pickupwindow_handle = document.getElementById("PickupWindowHandle");
+
 const ruby_text = document.getElementById("RubyText");
 const base_text = document.getElementById("BaseText");
 
@@ -23,14 +26,55 @@ var ruby_parent;
 var ruby_begin;
 var ruby_end;
 
+var drag_x;
+var drag_y;
+var drag_start_top;
+var drag_start_width;
 
+pickupwindow_handle.onmousedown = (e)=>
+{
+    e.preventDefault();
+    drag_x = e.pageX;
+    drag_y = e.pageY;
+    drag_start_top = parseInt(pickupwindow.style.top);
+    drag_start_width = parseInt(pickupwindow.style.width);
+    document.addEventListener("mousemove",onDragMouseMove, false);
+    document.addEventListener("mouseup",onDragMouseUp, false);
+}
+
+function onDragMouseMove(e) {
+
+    const move_y = (e.pageY - drag_y);
+    pickupwindow.style.top = drag_start_top + move_y + "px";
+
+    const rect = pickupwindow.getBoundingClientRect();
+    const parent_rect = list.getBoundingClientRect();
+
+    if (rect.top < parent_rect.top)
+        pickupwindow.style.top = parent_rect.top + "px";
+    else if (rect.bottom > parent_rect.bottom)
+        pickupwindow.style.top = (parent_rect.bottom - rect.height) + "px";
+
+    const move_x = (e.pageX - drag_x);
+    let new_width = drag_start_width - move_x;
+    new_width = Math.min(Math.max(new_width,300),parent_rect.width * 3 / 4);
+    pickupwindow.style.width = new_width + "px";
+}
+function onDragMouseUp(e){
+    document.removeEventListener('mousemove', onDragMouseMove, false);
+    document.removeEventListener('mouseup', onDragMouseUp, false);
+}
 
 function ResetUniteButton()
 {
     const prev = pickupElement.previousElementSibling;
     unite_left_button.disabled = (prev == null || prev.tagName.toLowerCase() !== "ruby");
+    //disabledにするとマウスイベントを遮断しやがるので透過させる
+    unite_left_button.style.pointerEvents = (unite_left_button.disabled) ? "none" : null;
+    
     const next = pickupElement.nextElementSibling;
     unite_right_button.disabled = (next == null || next.tagName.toLowerCase() !== "ruby");
+    unite_right_button.style.pointerEvents = (unite_right_button.disabled) ? "none" : null;
 }
 
 function ResetPickupControl()
@@ -42,10 +86,10 @@ function ResetPickupControl()
         ruby_control.style.visibility = null;
         addremove_button.value = "削除";
         addremove_button.disabled = false;
+        addremove_button.style.pointerEvents = null;
         ResetUniteButton();
 
         delete_button.style.visibility = "hidden";
-
     }
     else
     {
@@ -54,10 +98,14 @@ function ResetPickupControl()
         ruby_control.style.visibility = "hidden";
         addremove_button.value = "追加";
         addremove_button.disabled = true;
+        //disabledにするとマウスイベントを遮断しやがるので透過させる
+        addremove_button.style.pointerEvents = "none";
+
 
         delete_button.style.visibility = null;
     }
-    delete_button.disabled = true;   
+    delete_button.disabled = true;
+    delete_button.style.pointerEvents = "none";
 }
 
 ruby_text.oninput = (e)=>
@@ -100,6 +148,8 @@ base_text.oninput = (e)=>
                 pickupElement.textContent = base_text.value;
             }
             delete_button.disabled = base_text.value != "";
+            delete_button.style.pointerEvents = delete_button.disabled ? "none" : null;
+
         }
     }
 }
@@ -111,13 +161,12 @@ function onsSelectionchange(e)
         const bs = base_text.selectionStart,be = base_text.selectionEnd;
         division_button.disabled = 
             !(rs ==  re && rs != 0 && re != ruby_text.value.length && bs ==  be && bs != 0 && be != base_text.value.length);
+        division_button.style.pointerEvents = division_button.disabled ? "none" : null;
     }
     else
     {
-        if (ruby_text.value != "" && base_text.selectionStart != base_text.selectionEnd)
-            addremove_button.disabled = false;
-        else
-            addremove_button.disabled = true;
+        addremove_button.disabled = !(ruby_text.value != "" && base_text.selectionStart != base_text.selectionEnd);
+        addremove_button.style.pointerEvents = addremove_button.disabled ? "none" : null;
     }
 
 }
@@ -247,6 +296,7 @@ division_button.onclick = (e)=>
 
         ResetUniteButton();
         division_button.disabled = true;
+        division_button.style.pointerEvents = "none";        
     }
 
 }
@@ -283,8 +333,22 @@ unite_right_button.onclick = (e)=>
     ResetUniteButton();
 }
 
+function keydown(e)
+{
+    if (e.target == ruby_text || e.target == base_text)
+        return
+    e.preventDefault();
+    switch (e.code)
+    {
+        case "ArrowLeft":
+            break;
+    }
+}
+//    document.addEventListener("keydown",keydown,false);
+
 function Initialize(text_data)
 {
+
     const ruby_text = new RubyText(text_data);
     ruby_parent = ruby_text.attag.ruby_parent;
     ruby_begin = ruby_text.attag.ruby_begin;
@@ -318,14 +382,15 @@ function Initialize(text_data)
     pickupElement.classList.add("Selected");
     document.addEventListener("selectionchange",onsSelectionchange,false);
 
+    const rect = list.getBoundingClientRect();
 //    const scroll_width = window.innerWidth - document.documentElement.clientWidth;
-    const element = document.getElementById("LineList");
-    const scroll_width =  element.offsetWidth - element.clientWidth;
-    fixed_window = document.getElementById("PickupWindow");
-    fixed_window.style.right = scroll_width + 2 + "px";
-    fixed_window.style.bottom = "4px";
+    const scroll_width =  list.offsetWidth - list.clientWidth;
+    pickupwindow.style.right = scroll_width + 2 + "px";
+    pickupwindow.style.top = rect.top + "px";
+    pickupwindow.style.width = list.clientWidth / 2 + "px";
 
     ResetPickupControl();
+
 }
 
 function Terminalize()

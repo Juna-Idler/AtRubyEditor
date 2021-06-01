@@ -41,17 +41,20 @@ input[name="mode_tab"]
     padding: 0px 8px;
     margin:0px 8px;
     border: 1px solid #000000;
-    border-bottom: 4px solid #BBBBBB;
-    border-top: 4px solid #eeeeee;
-    background-color: #dddddd;
+    border-bottom: 1px solid #FFFFFF;
+    background-color: #BBBBBB;
+    color: white;
 
+    text-align: center;
     width: 30%;
 }
 #TabText:checked ~ * #TabTextLabel ,
 #TabRuby:checked ~ * #TabRubyLabel
 {
-    background-color: #999999;
-    color: #fff;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    color: black;
+
 }
 #TabText:checked ~ #TextEdit ,
 #TabRuby:checked ~ #RubyEdit
@@ -91,7 +94,7 @@ input[name="mode_tab"]
     height: 115%;
     resize:none;
     flex:1 1 auto;
-    margin: 2px;
+    margin: 0 2px 2px;
     padding: 2px;
     white-space: pre;
 }
@@ -121,10 +124,10 @@ input[name="mode_tab"]
 #LineList
 {
     border: solid 1px black;
-    margin: 2px;
-    font-size: 1.2rem;
-    list-style-type: decimal-leading-zero;
+    margin: 0 2px 2px;
     overflow-y :scroll;
+
+    list-style-type:decimal-leading-zero;
 }
 
 .Line
@@ -137,6 +140,8 @@ input[name="mode_tab"]
 {
     border: 1px solid transparent;
     cursor: default;
+    font-size: 1.2rem;
+
 }
 
 #LineList .Selected
@@ -144,7 +149,9 @@ input[name="mode_tab"]
     border: blue 1px solid;
 }
 
-ruby{
+#LineList ruby{
+    font-size: 1.2rem;
+
     border: 1px dashed red;
     border-top:transparent;
     margin: 0 1px;
@@ -152,7 +159,7 @@ ruby{
 
     cursor: default;
 }
-rt
+#LineList rt
 {
     border-top: 0px dashed red;    
 }
@@ -161,14 +168,19 @@ rt
 #PickupWindow
 {
     position: fixed;
-    right: 0px;
-    bottom: 0px;
     width: 50%;
 
-    display: flex;
-    flex-direction: column;
     border: 1px solid black;
     padding: 1px;
+    background-color: #EEEEEE;
+}
+#PickupWindowHandle
+{
+    width: 16px;
+    flex: 0 0 auto;
+
+    background-color: #DDDDDD;
+    cursor: grab;
 }
 #RubyText
 {
@@ -195,11 +207,6 @@ rt
     flex: 0 0 auto;
     margin: 1px;
     width: 64px;
-}
-#PickupWindowControl
-{
-    width: 16px;
-    flex: 0 0 auto;
 }
 .ruby_control_button
 {
@@ -232,23 +239,20 @@ rt
     <div id="RubyEdit" class="TabContent">
         <ol id="LineList">
         </ol>
-        <div id="PickupWindow">
-            <div class="flex_h">
-                <button id="PickupWindowControl"></button>
-                <div class="flex_v flex_item">
-                    <div class="flex_h">
-                        <input type="text" id="RubyText"><input type="button" id="RubyAddRemove" value="追加" disabled>
-                    </div>
-                    <div class="flex_h">
-                        <input type="text" id="BaseText"><input type="button" id="Delete" value="消去" disabled>
-                    </div>
+        <div id="PickupWindow" class="flex_h">
+            <div id="PickupWindowHandle"></div>
+            <div class="flex_v flex_item">
+                <div class="flex_h flex_item">
+                    <input type="text" id="RubyText"><input type="button" id="RubyAddRemove" value="追加" disabled>
                 </div>
-            </div>
-
-            <div id="RubyControl" class="flex_h flex_between">
+                <div class="flex_h flex_item">
+                    <input type="text" id="BaseText"><button type="button" id="Delete" value="消去" disabled>消去</button>
+                </div>
+                <div id="RubyControl" class="flex_h flex_between">
                     <button id="UniteLeft" class="ruby_control_button" disabled>左と結合</button>
                     <button id="Division" class="ruby_control_button" disabled>分割</button>
                     <button id="UniteRight" class="ruby_control_button" disabled>右と結合</button>
+                </div>
             </div>
         </div>
     </div>
