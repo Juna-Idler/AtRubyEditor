@@ -10,7 +10,7 @@ html,body{
 }
 button, input, select, textarea {
     font-family : inherit;
-    font-size : 100%;
+    font-size : 1rem;
 }
 #Screen
 {
@@ -20,6 +20,45 @@ button, input, select, textarea {
     padding:2px;
     box-sizing: border-box;
 }
+
+
+#TabLabels
+{
+    flex: 0 1 auto;
+    padding-top: 2px;
+    border-bottom: 0px solid #999999;
+}
+input[name="mode_tab"]
+{
+    display: none;
+}
+.TabContent{
+    display: none;
+}
+.tab_label
+{
+    display: inline-block;
+    padding: 0px 8px;
+    margin:0px 8px;
+    border: 1px solid #000000;
+    border-bottom: 4px solid #BBBBBB;
+    border-top: 4px solid #eeeeee;
+    background-color: #dddddd;
+
+    width: 30%;
+}
+#TabText:checked ~ * #TabTextLabel ,
+#TabRuby:checked ~ * #TabRubyLabel
+{
+    background-color: #999999;
+    color: #fff;
+}
+#TabText:checked ~ #TextEdit ,
+#TabRuby:checked ~ #RubyEdit
+{
+    display:flex;
+}
+
 
 
 .flex_v{
@@ -41,30 +80,84 @@ button, input, select, textarea {
     justify-content:space-between;    
 }
 
+#TextEdit
+{
+    height :100%;
+    flex-direction: column;
+    flex: 1 1 auto;
+}    
+#TextArea
+{
+    height: 115%;
+    resize:none;
+    flex:1 1 auto;
+    margin: 2px;
+    padding: 2px;
+    white-space: pre;
+}
+.bottom_controls_area
+{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;        
+    flex:0 0 auto;
+}
+.bottom_controls
+{
+    padding: 0rem 2rem;
+    margin :2px 8px;
+}
+
+
+
+#RubyEdit
+{
+    flex-direction: column;
+    height: 100%;
+    flex: 1 1 auto;
+    overflow-y :hidden;
+}
 
 #LineList
 {
-    margin:0;
+    border: solid 1px black;
+    margin: 2px;
     font-size: 1.2rem;
     list-style-type: decimal-leading-zero;
+    overflow-y :scroll;
 }
 
 .Line
 {
-    line-height: 2.5;
+    line-height: 2.0;
     margin: 0px;
 }
 
+#LineList span
+{
+    border: 1px solid transparent;
+    cursor: default;
+}
+
+#LineList .Selected
+{
+    border: blue 1px solid;
+}
+
 ruby{
-    border: 1px solid red;
+    border: 1px dashed red;
     border-top:transparent;
     margin: 0 1px;
     padding: 0 1px;
+
+    cursor: default;
 }
 rt
 {
-    border-top: 1px solid blue;    
+    border-top: 0px dashed red;    
 }
+
+
 #PickupWindow
 {
     position: fixed;
@@ -83,9 +176,9 @@ rt
     margin: 1px;
 
     text-align: center;
-
     flex: 1 1 auto;
 
+    width:3rem;
 }
 #BaseText
 {
@@ -94,6 +187,7 @@ rt
 
     text-align: center;
     flex: 1 1 auto;
+    width:3rem;
 
 }
 #RubyAddRemove,#Delete
@@ -106,7 +200,11 @@ rt
 {
     width: 16px;
     flex: 0 0 auto;
-
+}
+.ruby_control_button
+{
+    margin: 1px;
+    flex: 1 1 auto;
 }
 
 
@@ -115,16 +213,31 @@ rt
 </head>
 <body>
 <div id="Screen">
-    <div id="EditArea">
+    <input type="radio" id="TabText" name="mode_tab" checked>
+    <input type="radio" id="TabRuby" name="mode_tab">
+    <div id="TabLabels">
+        <label for="TabText" id="TabTextLabel" class="tab_label">TextEdit</label>
+        <label for="TabRuby" id="TabRubyLabel" class="tab_label">RubyEdit</label>
+        <span style="float: right;">Help</span>
+    </div>
+    <div id="TextEdit" class="TabContent">
+        <textarea id="TextArea" spellcheck="false"></textarea>
+        <div class="bottom_controls_area">
+            <label for="EditOutputSwitch"  id="EditOutputOpen" class="bottom_controls">出力</label>
+            <label><input type="checkbox" id="AutoSave" class="bottom_controls">オートセーブ</label>
+        </div>
+    </div>
+
+
+    <div id="RubyEdit" class="TabContent">
         <ol id="LineList">
         </ol>
-        <div id="Cursor">▲</div>
         <div id="PickupWindow">
             <div class="flex_h">
                 <button id="PickupWindowControl"></button>
                 <div class="flex_v flex_item">
                     <div class="flex_h">
-                        <input type="text" id="RubyText"><input type="button" id="RubyAddRemove" value="追加/削除" disabled>
+                        <input type="text" id="RubyText"><input type="button" id="RubyAddRemove" value="追加" disabled>
                     </div>
                     <div class="flex_h">
                         <input type="text" id="BaseText"><input type="button" id="Delete" value="消去" disabled>
@@ -133,19 +246,16 @@ rt
             </div>
 
             <div id="RubyControl" class="flex_h flex_between">
-                    <button id="UniteLeft" class="flex_item" disabled>左と結合</button>
-                    <button id="Division" class="flex_item" disabled>分割</button>
-                    <button id="UniteRight" class="flex_item" disabled>右と結合</button>
+                    <button id="UniteLeft" class="ruby_control_button" disabled>左と結合</button>
+                    <button id="Division" class="ruby_control_button" disabled>分割</button>
+                    <button id="UniteRight" class="ruby_control_button" disabled>右と結合</button>
             </div>
         </div>
-    </div>
-    <div>
-        <textarea id="InputText" spellcheck="false"></textarea>
     </div>
 </div>
 
 <script>
-document.getElementById("InputText").value = `
+document.getElementById("TextArea").value = `
 nn…
 
 ｜冷《つめ》たい｜水《みず》が｜無《な》くても｜平気《へいき》よ
@@ -216,5 +326,9 @@ nn……
 
     <script type='text/javascript' src='Global.js' defer></script>
     <script type='text/javascript' src='FileDrop.js' defer></script>
+
+    <script type='text/javascript' src='Mode_Ruby.js' defer></script>
+    <script type='text/javascript' src='Mode_Text.js' defer></script>
+    
 </body>
 </html>
