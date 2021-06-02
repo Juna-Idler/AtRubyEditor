@@ -1,6 +1,4 @@
 
-const textarea = document.getElementById("InputText");
-
 
 var ModeTextInitializer;
 var ModeRubyInitializer;

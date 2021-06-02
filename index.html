@@ -21,6 +21,48 @@ button, input, select, textarea {
     box-sizing: border-box;
 }
 
+#HelpButton
+{
+    vertical-align: middle;
+    border: black 1px solid;
+    float: right;
+    margin-right: 32px;
+    padding: 1px 8px;
+}
+#HelpSwitch,#EditOutputSwitch
+{
+    display: none;
+}
+#HelpSwitch:checked ~ #HelpOverlap
+{
+    display: block;
+}
+#HelpOverlap
+{
+    position: fixed;
+    display: none;
+    width:100%;
+    height:100%;
+    top:0;left:0;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+#HelpClose
+{
+    position: absolute;
+    right:0px;
+    top:2px;
+    font-size: 32px;
+    color: black;
+    background-color: white;
+    padding: 0px 8px;
+}
+#HelpPage
+{
+    width:100%;
+    height:100%;
+}
+
 
 #TabLabels
 {
@@ -141,6 +183,7 @@ input[name="mode_tab"]
     border: 1px solid transparent;
     cursor: default;
     font-size: 1.2rem;
+    padding: 0.5rem 0 0.2rem;
 
 }
 
@@ -155,7 +198,7 @@ input[name="mode_tab"]
     border: 1px dashed red;
     border-top:transparent;
     margin: 0 1px;
-    padding: 0 1px;
+    padding: 0.5rem 1px 0.2rem;
 
     cursor: default;
 }
@@ -220,18 +263,22 @@ input[name="mode_tab"]
 </head>
 <body>
 <div id="Screen">
+    <input type="checkbox" id="HelpSwitch">
+    <div id="HelpOverlap">
+        <label for="HelpSwitch" id="HelpClose">×</label>
+        <iframe id="HelpPage" src="help.html"></iframe>
+    </div>
+
     <input type="radio" id="TabText" name="mode_tab" checked>
     <input type="radio" id="TabRuby" name="mode_tab">
     <div id="TabLabels">
         <label for="TabText" id="TabTextLabel" class="tab_label">TextEdit</label>
         <label for="TabRuby" id="TabRubyLabel" class="tab_label">RubyEdit</label>
-        <span style="float: right;">Help</span>
+        <label for="HelpSwitch" id="HelpButton">？</label>
     </div>
     <div id="TextEdit" class="TabContent">
         <textarea id="TextArea" spellcheck="false"></textarea>
         <div class="bottom_controls_area">
-            <label for="EditOutputSwitch"  id="EditOutputOpen" class="bottom_controls">出力</label>
-            <label><input type="checkbox" id="AutoSave" class="bottom_controls">オートセーブ</label>
         </div>
     </div>
 
@@ -259,77 +306,21 @@ input[name="mode_tab"]
 </div>
 
 <script>
-document.getElementById("TextArea").value = `
-nn…
 
-｜冷《つめ》たい｜水《みず》が｜無《な》くても｜平気《へいき》よ
-｜柔《やわ》らかな｜土《つち》もそういらないの
-｜凍《い》てつく｜夜《よる》も｜乗《の》り｜越《こ》えられるわ
-｜砂漠《さばく》に｜一人《ひとり》たたずんでいても
-
-｜日差《ひざ》し｜浴《あ》びて ｜光《ひかり》｜受《う》けて
-｜一人《ひとり》そっと｜花《はな》｜咲《さ》かす そんな｜日《ひ》
-ずっと
-
-｜待《ま》ち｜望《のぞ》んだのほんとなの
-わたしは｜一人《ひとり》の サボテン
-｜一人《ひとり》でいても｜平気《へいき》なの
-｜空《そら》と｜風《かぜ》だけがあればいい
-
-
-
-｜緑《みどり》の｜野辺《のべ》のさざめく｜花《はな》｜達《たち》
-わたしにはきっととおい｜揺《ゆ》らめき
-わたしのことを｜連《つ》れてゆかないで
-この｜砂漠《さばく》からね ｜連《つ》れ｜出《だ》さないで
-
-だってわたし ずっとひとり
-きっとうまくできないことばかり
-だから
-
-｜柔《やわ》らかな｜土《つち》いらないの
-｜水《みず》もそう ほんとにいいの
-｜暖《あたた》かな｜陽射《ひざ》しが｜薫《かお》る
-テラスにわたしを｜置《お》かないで
-
-
-こまるのよ｜本当《ほんとう》にこんなこと
-この｜部屋《へや》に｜安《やす》らぎを｜感《かん》じたら
-｜凍《い》てつく｜夜《よる》も ｜灼《や》け｜付《つ》く｜朝《あさ》にも
-もう｜戻《もど》れないそんな｜気《き》がするの
-
-｜日差《ひざ》し｜浴《あ》びて ｜光《ひかり》｜受《う》けて
-そっと｜花《はな》を｜咲《さ》かせる｜日《ひ》 その｜日《ひ》を
-きっと
-
-あなたのそばで｜迎《むか》えるの
-わたしはあなたのものじゃないけど
-あなたの｜隣《となり》で ｜花《はな》を｜咲《さ》かせてもいいと
-n…n…
-
-
-ひなたいろ
-やさしいそらにも
-やわらかな
-このぬくもりのなかに
-nn……
-nn……
-nn……
-nn……
-
-ひなたいろ……
-
-
-
-@ruby_parent=｜
-@ruby_begin=《
-@ruby_end=》
-`;
+(function(){
+const params = (new URL(document.location)).searchParams;
+const input = params.get("input");
+if (input != null)
+{
+    const value = localStorage.getItem(input);
+    document.getElementById("TextArea").value = value != null ? value : "";
+}
+}());
 </script>
+
     <script type='text/javascript' src='Ruby.js' defer></script>
 
     <script type='text/javascript' src='Global.js' defer></script>
-    <script type='text/javascript' src='FileDrop.js' defer></script>
 
     <script type='text/javascript' src='Mode_Ruby.js' defer></script>
     <script type='text/javascript' src='Mode_Text.js' defer></script>
